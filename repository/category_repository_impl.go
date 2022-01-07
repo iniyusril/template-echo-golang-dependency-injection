@@ -2,11 +2,10 @@ package repository
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 
 	"github.com/iniyusril/template/helper"
 	"github.com/iniyusril/template/model/domain"
+	"github.com/jinzhu/gorm"
 )
 
 type CategoryRepositoryImpl struct {
@@ -16,63 +15,56 @@ func NewCategoryRepository() CategoryRepository {
 	return &CategoryRepositoryImpl{}
 }
 
-func (repository *CategoryRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, category domain.Category) domain.Category {
-	SQL := "insert into category(name) values ($1) RETURNING id"
+func (repository *CategoryRepositoryImpl) Save(ctx context.Context, tx *gorm.DB, category domain.Category) domain.Category {
 
-	var id int
-	if err := tx.QueryRowContext(ctx, SQL, category.Name).Scan(&id); err != nil {
-		helper.PanicIfError(err)
-
-	}
-
-	category.Id = int(id)
-	return category
-}
-
-func (repository *CategoryRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, category domain.Category) domain.Category {
-	SQL := "update category set name = $1 where id = $2"
-	_, err := tx.ExecContext(ctx, SQL, category.Name, category.Id)
-	helper.PanicIfError(err)
+	tx.Create(&category)
 
 	return category
 }
 
-func (repository *CategoryRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, category domain.Category) {
-	SQL := "delete from category where id = $1"
-	_, err := tx.ExecContext(ctx, SQL, category.Id)
-	helper.PanicIfError(err)
-}
+func (repository *CategoryRepositoryImpl) Update(ctx context.Context, tx *gorm.DB, category domain.Category) domain.Category {
 
-func (repository *CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, categoryId int) (domain.Category, error) {
-	SQL := "select id, name from category where id = $1"
-	rows, err := tx.QueryContext(ctx, SQL, categoryId)
-	helper.PanicIfError(err)
-	defer rows.Close()
+	id := category.ID
 
-	category := domain.Category{}
-	if rows.Next() {
-		err := rows.Scan(&category.Id, &category.Name)
+	categoryNew := domain.Category{}
+	if err := tx.Where("id = ?", id).First(&categoryNew).Error; err != nil {
 		helper.PanicIfError(err)
-		return category, nil
-	} else {
-		err := errors.New("category is not found")
-		helper.PanicIfError(err)
-		return category, err
 	}
+	categoryNew.Name = category.Name
+
+	tx.Save(categoryNew)
+
+	return category
 }
 
-func (repository *CategoryRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Category {
-	SQL := "select id, name from category"
-	rows, err := tx.QueryContext(ctx, SQL)
-	helper.PanicIfError(err)
-	defer rows.Close()
+func (repository *CategoryRepositoryImpl) Delete(ctx context.Context, tx *gorm.DB, category domain.Category) {
 
+	var categoryNew domain.Category
+
+	if err := tx.Where("id = ?", category.ID).First(&categoryNew).Error; err != nil {
+		helper.PanicIfError(err)
+	}
+	tx.Delete(&categoryNew)
+
+}
+
+func (repository *CategoryRepositoryImpl) FindById(ctx context.Context, tx *gorm.DB, categoryId int) (domain.Category, error) {
+
+	var category domain.Category
+
+	if err := tx.Where("id = ?", categoryId).First(&category).Error; err != nil {
+		helper.PanicIfError(err)
+	}
+
+	return category, nil
+
+}
+
+func (repository *CategoryRepositoryImpl) FindAll(ctx context.Context, tx *gorm.DB) []domain.Category {
 	var categories []domain.Category
-	for rows.Next() {
-		category := domain.Category{}
-		err := rows.Scan(&category.Id, &category.Name)
+	if err := tx.Find(&categories).Error; err != nil {
 		helper.PanicIfError(err)
-		categories = append(categories, category)
 	}
 	return categories
+
 }

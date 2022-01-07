@@ -1,6 +1,8 @@
 package domain
 
+import "github.com/jinzhu/gorm"
+
 type Category struct {
-	Id   int
+	gorm.Model
 	Name string
 }

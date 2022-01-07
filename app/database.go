@@ -1,15 +1,17 @@
 package app
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/iniyusril/template/helper"
+	"github.com/iniyusril/template/model/domain"
+	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 )
 
-func NewDB() *sql.DB {
+func NewDB() *gorm.DB {
 	var (
 		host     = os.Getenv("DB_POSTGREE_HOST")
 		port     = os.Getenv("DB_POSTGREE_PORT")
@@ -18,10 +20,14 @@ func NewDB() *sql.DB {
 		dbname   = os.Getenv("DB_POSTGREE_DBNAME")
 	)
 
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-	db, err := sql.Open("postgres", psqlInfo)
+	dsn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", host, port, user, dbname, password)
+
+	db, err := gorm.Open("postgres", dsn)
+
+	isMigrate, err := strconv.ParseBool(os.Getenv("DB_POSTGREE_IS_AUTO_MIGRATE"))
+	if isMigrate && err == nil {
+		db.AutoMigrate(&domain.Category{})
+	}
 
 	if err != nil {
 		helper.PanicIfError(err)

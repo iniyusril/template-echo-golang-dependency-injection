@@ -1,10 +1,8 @@
 package middleware
 
 import (
-	"errors"
 	"net/http"
 
-	"github.com/iniyusril/template/helper"
 	"github.com/iniyusril/template/model/web"
 	"github.com/labstack/echo/v4"
 )
@@ -14,7 +12,6 @@ func ServeHTTP(next echo.HandlerFunc) echo.HandlerFunc {
 		if c.Request().Header.Get("X-API-KEY") == "RAHASIA" {
 			return next(c)
 		} else {
-			helper.PanicIfError(errors.New("gagal"))
 			c.Response().Header().Set("Content-Type", "application/json")
 			c.Response().WriteHeader(http.StatusUnauthorized)
 
