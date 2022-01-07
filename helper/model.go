@@ -19,3 +19,18 @@ func ToCategoryResponses(categories []domain.Category) []web.CategoryResponse {
 	}
 	return categoryResponses
 }
+
+func ToUserResponse(user domain.User) web.UserResponse {
+	return web.UserResponse{
+		ID:       user.ID,
+		Username: user.Username,
+	}
+}
+
+func ToUserResponses(users []domain.User) []web.UserResponse {
+	var userResponses []web.UserResponse
+	for _, user := range users {
+		userResponses = append(userResponses, ToUserResponse(user))
+	}
+	return userResponses
+}

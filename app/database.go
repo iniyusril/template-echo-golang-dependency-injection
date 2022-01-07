@@ -16,11 +16,12 @@ func NewDB() *sql.DB {
 		user     = os.Getenv("DB_POSTGREE_USER")
 		password = os.Getenv("DB_POSTGREE_PASSWORD")
 		dbname   = os.Getenv("DB_POSTGREE_DBNAME")
+		schema   = os.Getenv("DB_POSTGREE_SCHEMA")
 	)
 
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+		"password=%s dbname=%s sslmode=disable search_path=%s",
+		host, port, user, password, dbname, schema)
 	db, err := sql.Open("postgres", psqlInfo)
 
 	if err != nil {

@@ -24,10 +24,15 @@ func InitializedServer() *echo.Echo {
 	validate := validator.New()
 	categoryService := service.NewCategoryService(categoryRepository, db, validate)
 	categoryController := controller.NewCategoryController(categoryService)
-	echoEcho := app.NewRouter(categoryController)
+	userRepository := repository.NewUserRepository()
+	userService := service.NewUserService(userRepository, db, validate)
+	userController := controller.NewUserController(userService)
+	echoEcho := app.NewRouter(categoryController, userController)
 	return echoEcho
 }
 
 // inject.go:
 
 var categorySet = wire.NewSet(repository.NewCategoryRepository, service.NewCategoryService, controller.NewCategoryController)
+
+var userSet = wire.NewSet(repository.NewUserRepository, service.NewUserService, controller.NewUserController)
