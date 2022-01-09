@@ -5,7 +5,7 @@ import (
 
 	"github.com/iniyusril/template/helper"
 	"github.com/iniyusril/template/model/domain"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type CategoryRepositoryImpl struct {

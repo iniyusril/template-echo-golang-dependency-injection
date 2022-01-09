@@ -6,7 +6,7 @@ import (
 	"github.com/iniyusril/template/exception"
 	"github.com/iniyusril/template/helper"
 	"github.com/iniyusril/template/model/web"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/iniyusril/template/model/domain"

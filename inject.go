@@ -1,5 +1,5 @@
 //go:build wireinject
-// +build wireinject
+//+build wireinject
 
 package main
 
@@ -22,7 +22,17 @@ var categorySet = wire.NewSet(
 	// wire.Bind(new(controller.CategoryController), new(*controller.CategoryControllerImpl)),
 )
 
+
+var userSet = wire.NewSet(
+	repository.NewUserRepository,
+	// wire.Bind(new(repository.CategoryRepository), new(*repository.CategoryRepositoryImpl)),
+	service.NewUserService,
+	// wire.Bind(new(service.CategoryService), new(*repository.CategoryRepositoryImpl)),
+	controller.NewUserController,
+	// wire.Bind(new(controller.CategoryController), new(*controller.CategoryControllerImpl)),
+)
+
 func InitializedServer() *echo.Echo {
-	wire.Build(app.NewDB, validator.New, categorySet, app.NewRouter)
+	wire.Build(app.NewDB, validator.New, categorySet,userSet, app.NewRouter)
 	return nil
 }

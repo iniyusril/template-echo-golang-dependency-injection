@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/iniyusril/template/model/domain"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type CategoryRepository interface {

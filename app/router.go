@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func NewRouter(categoryController controller.CategoryController) *echo.Echo {
+func NewRouter(categoryController controller.CategoryController, userController controller.UserController) *echo.Echo {
 	e := echo.New()
 	g := e.Group("/api/categories")
 	g.Use(cstmmiddleware.ServeHTTP)
@@ -19,6 +19,13 @@ func NewRouter(categoryController controller.CategoryController) *echo.Echo {
 	g.POST("", categoryController.Create)
 	g.PUT("/:categoryId", categoryController.Update)
 	g.DELETE("/:categoryId", categoryController.Delete)
+
+	user := e.Group("/api/v1/users")
+	user.GET("", userController.FindAll)
+	user.GET("/:userId", userController.FindById)
+	user.POST("", userController.Create)
+	user.PUT("/:userId", userController.Update)
+	user.DELETE("/:userId", userController.Delete)
 
 	e.HTTPErrorHandler = exception.ErrorHandler
 	e.Use(
